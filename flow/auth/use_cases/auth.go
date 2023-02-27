@@ -2,8 +2,10 @@ package use_cases
 
 import (
 	"database/sql"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/markbates/goth"
 	"log"
+	"os"
 	"soundpad-backend/dals"
 	"soundpad-backend/dals/entity"
 )
@@ -20,7 +22,7 @@ func NewAuthUsecase(
 	}
 }
 
-func (a *AuthUseCase) SignInOrSignUp(gothUser goth.User) (*entity.User, error) {
+func (a *AuthUseCase) SignInOrSignUp(gothUser goth.User) (string, error) {
 
 	soundPadUser, err := a.dal.RetrieveUserByEmail(gothUser.Email)
 	log.Printf("Soundpad user = %s\n", soundPadUser.Email)
@@ -34,15 +36,30 @@ func (a *AuthUseCase) SignInOrSignUp(gothUser goth.User) (*entity.User, error) {
 		id, err := a.dal.CreateUser(soundPadUser)
 		if err != nil {
 			log.Printf("Error creating user: %s\n", err)
-			return nil, err
+			return "", err
 		}
 		soundPadUser.Id = id
 		log.Println("New user registered.")
-		return soundPadUser, err
 	}
+
+	token, err := generateJwt(soundPadUser)
+
+	return token, err
+}
+
+func generateJwt(user *entity.User) (string, error) {
+	key := []byte(os.Getenv("AUTH_HMAC_SECRET"))
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"email": user.Email,
+	})
+
+	// Sign and get the complete encoded token as a string using the secret
+	tokenString, err := token.SignedString(key)
 	if err != nil {
-		log.Fatalf("Error trying to retrieve user by email: %s", err)
-		return nil, err
+		log.Fatalf("Could not generate JWT: %s", err)
+		return "", err
 	}
-	return soundPadUser, nil
+
+	log.Printf("JWT = %s", tokenString)
+	return tokenString, nil
 }
