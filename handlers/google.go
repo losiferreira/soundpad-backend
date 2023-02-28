@@ -6,9 +6,9 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"soundpad-backend/flow/auth/handlers/models"
-	"soundpad-backend/flow/auth/shared"
-	"soundpad-backend/flow/auth/use_cases"
+	"soundpad-backend/handlers/models"
+	"soundpad-backend/shared"
+	"soundpad-backend/use_cases"
 )
 
 type GoogleHandler struct {
@@ -30,7 +30,7 @@ func (g *GoogleHandler) HandleGoogleLogin(w http.ResponseWriter, r *http.Request
 func (g *GoogleHandler) HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	user, err := gothic.CompleteUserAuth(w, r)
 	if err != nil {
-		log.Fatal(w, err)
+		log.Printf("Error completing user auth: %s", err)
 		return
 	}
 	w.WriteHeader(http.StatusOK)

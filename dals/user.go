@@ -23,12 +23,11 @@ func NewUserDal(
 }
 
 func (u *UserDal) CreateUser(user *entity.User) (int64, error) {
-	_, err := u.db.NewInsert().Model(user).Exec(u.ctx)
+	_, err := u.db.NewInsert().Model(user).Returning("id").Exec(u.ctx)
 	if err != nil {
-		log.Fatalf("Error creating user: %s", err)
+		log.Printf("Error creating user: %s", err)
 		return 0, err
 	}
-	user, err = u.RetrieveUserByEmail(user.Email)
 	return user.Id, nil
 }
 
@@ -48,12 +47,4 @@ func (u *UserDal) RetrieveUserByEmail(email string) (*entity.User, error) {
 		Where("? = ?", bun.Ident("email"), email).
 		Scan(u.ctx)
 	return result, err
-}
-
-func (u *UserDal) UpdateUser() {
-
-}
-
-func (u *UserDal) DeleteUser() {
-
 }

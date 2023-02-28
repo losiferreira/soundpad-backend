@@ -7,10 +7,9 @@ import (
 	"log"
 	"net/http"
 	"soundpad-backend/dals"
-	authHandlers "soundpad-backend/flow/auth/handlers"
-	"soundpad-backend/flow/auth/use_cases"
-	soundHandlers "soundpad-backend/flow/sound/handlers"
+	"soundpad-backend/handlers"
 	"soundpad-backend/providers"
+	"soundpad-backend/use_cases"
 )
 
 func main() {
@@ -21,17 +20,24 @@ func main() {
 	// providers
 	bun := providers.NewBunDatabase().Setup()
 	providers.NewGoth().Setup()
+	aws := providers.NewAws().Setup()
+	jwt := providers.NewJwtHandler()
 
 	// dals
 	userDal := dals.NewUserDal(bun.Db, ctx)
+	soundDal := dals.NewSoundDal(bun.Db, ctx)
+	soundPadDal := dals.NewSoundPadDal(bun.Db, ctx)
 
 	// useCases
-	authUseCase := use_cases.NewAuthUsecase(userDal)
+	authUseCase := use_cases.NewAuthUsecase(jwt, userDal)
+	soundUseCase := use_cases.NewSoundUseCase(aws, soundDal)
+	soundPadUseCase := use_cases.NewSoundPadUseCase(soundPadDal)
 
 	// handlers
-	googleHandler := authHandlers.NewGoogleHandler(authUseCase)
-	soundHandler := soundHandlers.NewSoundHandler()
-	rootHandler := authHandlers.NewRootHandler()
+	googleHandler := handlers.NewGoogleHandler(authUseCase)
+	soundHandler := handlers.NewSoundHandler(soundUseCase)
+	soundPadHandler := handlers.NewSoundPadHandler(jwt, soundPadUseCase)
+	rootHandler := handlers.NewRootHandler()
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", rootHandler.HandleRoot)
@@ -39,7 +45,14 @@ func main() {
 	r.HandleFunc("/auth/{provider}", googleHandler.HandleGoogleLogin)
 	r.HandleFunc("/auth/{provider}/callback", googleHandler.HandleGoogleCallback)
 	//Sound
-	r.HandleFunc("/sound", soundHandler.HandlerUploadSound).Methods("POST")
+	r.HandleFunc("/sounds", soundHandler.HandleCreateSound).Methods("POST")
+	r.HandleFunc("/sounds", soundHandler.HandleRetrieveSound).Methods("GET")
+	r.HandleFunc("/sounds", soundHandler.HandleDeleteSound).Methods("DELETE")
+	//SoundPad
+	r.HandleFunc("/soundPads", soundPadHandler.HandleCreateSoundPad).Methods("POST")
+	r.HandleFunc("/soundPads", soundPadHandler.HandleRetrieveSoundPad).Methods("GET")
+	r.HandleFunc("/soundPads", soundPadHandler.HandleUpdateSoundPad).Methods("PUT")
+	r.HandleFunc("/soundPads", soundPadHandler.HandleDeleteSoundPad).Methods("DELETE")
 
 	log.Println("Listening to port 8080")
 	err := http.ListenAndServe(":8080", r)
