@@ -43,11 +43,9 @@ func (s *SoundPadHandler) HandleCreateSoundPad(w http.ResponseWriter, r *http.Re
 	err = s.useCase.CreateSoundPad(ownerId, soundPad)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("Error uploading soundPad: %s", err)
+		log.Printf("Error creating soundPad: %s", err)
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
 func (s *SoundPadHandler) HandleRetrieveSoundPad(w http.ResponseWriter, r *http.Request) {
@@ -70,8 +68,6 @@ func (s *SoundPadHandler) HandleRetrieveSoundPad(w http.ResponseWriter, r *http.
 		log.Printf("Error encoding sondpad: %s", err)
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
 func (s *SoundPadHandler) HandleUpdateSoundPad(w http.ResponseWriter, r *http.Request) {
@@ -87,7 +83,7 @@ func (s *SoundPadHandler) HandleUpdateSoundPad(w http.ResponseWriter, r *http.Re
 	soundPad, err = s.useCase.UpdateSoundPad(soundPad)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		log.Printf("Error uploading soundPad_pad: %s", err)
+		log.Printf("Error updating soundPad: %s", err)
 		return
 	}
 
@@ -96,8 +92,6 @@ func (s *SoundPadHandler) HandleUpdateSoundPad(w http.ResponseWriter, r *http.Re
 		log.Printf("Error encoding sondpad: %s", err)
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }
 
 func (s *SoundPadHandler) HandleDeleteSoundPad(w http.ResponseWriter, r *http.Request) {
@@ -114,6 +108,4 @@ func (s *SoundPadHandler) HandleDeleteSoundPad(w http.ResponseWriter, r *http.Re
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	w.WriteHeader(http.StatusOK)
 }

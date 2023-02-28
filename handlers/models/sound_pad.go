@@ -1,14 +1,15 @@
 package models
 
 import (
+	"encoding/json"
 	"soundpad-backend/dals/entity"
 	"strconv"
 )
 
 type SoundPad struct {
-	Id      string
-	Name    string
-	OwnerId string
+	Id      json.Number `json:"id,omitempty"`
+	Name    string      `json:"name,omitempty"`
+	OwnerId json.Number `json:"ownerId,omitempty"`
 
 	Sounds []*Sound
 }
@@ -20,9 +21,9 @@ func (s *SoundPad) FromEntity(entity *entity.SoundPad) *SoundPad {
 	}
 
 	return &SoundPad{
-		Id:      strconv.FormatInt(entity.Id, 10),
+		Id:      json.Number(strconv.FormatInt(entity.Id, 10)),
 		Name:    entity.Name,
-		OwnerId: strconv.FormatInt(entity.OwnerId, 10),
+		OwnerId: json.Number(strconv.FormatInt(entity.OwnerId, 10)),
 		Sounds:  sounds,
 	}
 }

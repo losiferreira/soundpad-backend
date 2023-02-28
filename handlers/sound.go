@@ -42,7 +42,7 @@ func (s *SoundHandler) HandleCreateSound(w http.ResponseWriter, r *http.Request)
 	err = s.useCase.CreateSound(file, name)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		log.Printf("Error uploading sound_pad: %s", err)
+		log.Printf("Error creating sound: %s", err)
 		return
 	}
 

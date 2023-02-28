@@ -37,7 +37,6 @@ func (s *SoundUseCase) CreateSound(
 	}
 	id, err := s.dal.CreateSound(soundEntity)
 	if err != nil {
-		log.Printf("Could not create sound_pad: %s", err)
 		return err
 	}
 	soundEntity.Id = id

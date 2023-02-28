@@ -1,25 +1,26 @@
 package models
 
 import (
+	"encoding/json"
 	"soundpad-backend/dals/entity"
 	"strconv"
 )
 
 type Sound struct {
-	Id       string
-	Name     string
-	FileName string
+	Id       json.Number `json:"id,string,omitempty"`
+	Name     string      `json:"name,omitempty"`
+	FileName string      `json:"fileName,omitempty"`
 }
 
 func (s *Sound) FromEntity(sound *entity.Sound) *Sound {
-	s.Id = strconv.FormatInt(sound.Id, 10)
+	s.Id = json.Number(strconv.FormatInt(sound.Id, 10))
 	s.Name = sound.FileName
 	s.FileName = sound.FileName
 	return s
 }
 
 func (s *Sound) ToEntity() (*entity.Sound, error) {
-	id, err := strconv.ParseInt(s.Id, 10, 64)
+	id, err := s.Id.Int64()
 	if err != nil {
 		return nil, err
 	}

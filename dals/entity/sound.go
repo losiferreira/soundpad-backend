@@ -5,7 +5,7 @@ import (
 )
 
 type Sound struct {
-	bun.BaseModel `bun:"table:sound,alias:s"`
+	bun.BaseModel `bun:"table:sounds,alias:s"`
 
 	Id       int64  `bun:"id,pk,autoincrement"`
 	Name     string `bun:"name"`

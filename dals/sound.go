@@ -3,7 +3,6 @@ package dals
 import (
 	"context"
 	"github.com/uptrace/bun"
-	"log"
 	"soundpad-backend/dals/entity"
 )
 
@@ -29,7 +28,6 @@ func (s *SoundDal) CreateSound(sound *entity.Sound) (int64, error) {
 		Returning("id").
 		Exec(s.ctx)
 	if err != nil {
-		log.Printf("Error creating sound_pad: %s", err)
 		return -1, err
 	}
 	return sound.Id, nil

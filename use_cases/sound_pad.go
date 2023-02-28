@@ -5,7 +5,6 @@ import (
 	"soundpad-backend/dals"
 	"soundpad-backend/dals/entity"
 	"soundpad-backend/handlers/models"
-	"strconv"
 )
 
 type SoundPadUseCase struct {
@@ -54,11 +53,7 @@ func (s *SoundPadUseCase) UpdateSoundPad(
 	soundPadModel *models.SoundPad,
 ) (*models.SoundPad, error) {
 
-	id, err := strconv.ParseInt(soundPadModel.Id, 10, 64)
-	if err != nil {
-		log.Printf("Could not parse sound pad id: %s", err)
-		return nil, err
-	}
+	id, _ := soundPadModel.Id.Int64()
 	soundPadEntity, err := s.dal.RetrieveSoundPad(id)
 	if soundPadEntity == nil || err != nil {
 		log.Printf("Could not retrieve soundPadModel: %s", err)
